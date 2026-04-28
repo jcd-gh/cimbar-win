@@ -54,7 +54,7 @@ TEST_CASE( "FountainSinkTest/testDefault", "[unit]" )
 {
 	MakeTempDirectory tempdir;
 
-	fountain_decoder_sink sink(690, write_on_store<std::ofstream>(tempdir.path()));
+	fountain_decoder_sink sink(690, write_on_store<std::ofstream>(tempdir.path().string()));
 	string iframe = createFrame(0, 1200);
 	assertEquals( 6900, iframe.size() );
 
@@ -76,9 +76,9 @@ TEST_CASE( "FountainSinkTest/testDefault", "[unit]" )
 	assertEquals( "", turbo::str::join(sink.get_progress()) );
 	assertEquals( "1.1600 0.1200", turbo::str::join(sink.get_done()) );
 
-	string contents = File(tempdir.path() / "0.1200").read_all();
+	string contents = File((tempdir.path() / "0.1200").string()).read_all();
 	assertEquals( 1200, contents.size() );
-	contents = File(tempdir.path() / "1.1600").read_all();
+	contents = File((tempdir.path() / "1.1600").string()).read_all();
 	assertEquals( 1600, contents.size() );
 }
 
@@ -86,7 +86,7 @@ TEST_CASE( "FountainSinkTest/testMultipart", "[unit]" )
 {
 	MakeTempDirectory tempdir;
 
-	fountain_decoder_sink sink(690, write_on_store<std::ofstream>(tempdir.path()));
+	fountain_decoder_sink sink(690, write_on_store<std::ofstream>(tempdir.path().string()));
 
 	stringstream input = dummyContents(20000);
 	fountain_encoder_stream::ptr fes = fountain_encoder_stream::create(input, 690, 2);
@@ -107,7 +107,7 @@ TEST_CASE( "FountainSinkTest/testMultipart", "[unit]" )
 	assertEquals( 0, sink.num_streams() );
 	assertEquals( 1, sink.num_done() );
 
-	string contents = File(tempdir.path() / "2.20000").read_all();
+	string contents = File((tempdir.path() / "2.20000").string()).read_all();
 	assertEquals( 20000, contents.size() );
 }
 
@@ -117,7 +117,7 @@ TEST_CASE( "FountainSinkTest/testSameFrameManyTimes", "[unit]" )
 	// sometimes it's fine. The docs say "don't do it", so FountainDecoder acts as the bouncer.
 	MakeTempDirectory tempdir;
 
-	fountain_decoder_sink sink(690, write_on_store<std::ofstream>(tempdir.path()));
+	fountain_decoder_sink sink(690, write_on_store<std::ofstream>(tempdir.path().string()));
 
 	stringstream input = dummyContents(20000);
 	fountain_encoder_stream::ptr fes = fountain_encoder_stream::create(input, 690, 3);

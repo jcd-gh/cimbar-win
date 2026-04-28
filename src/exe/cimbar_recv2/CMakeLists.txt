@@ -15,9 +15,10 @@ target_link_libraries(cimbar_recv2
 
 	cimbar_js
 	extractor
+	gui
 
-	GL
-	glfw
+	${OPENGL_LIB}
+	${GLFW_LIB}
 	${OPENCV_LIBS}
 	opencv_videoio
 )

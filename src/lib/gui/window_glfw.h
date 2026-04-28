@@ -4,6 +4,9 @@
 #include "gl_2d_display.h"
 #include "mat_to_gl.h"
 
+#ifdef _WIN32
+#include <glad/gles2.h>
+#endif
 #include <GLFW/glfw3.h>
 #include <chrono>
 #include <string>
@@ -38,6 +41,13 @@ public:
 			return;
 		}
 		glfwMakeContextCurrent(_w);
+#ifdef _WIN32
+		if (!gladLoadGLES2((GLADloadfunc)glfwGetProcAddress))
+		{
+			_good = false;
+			return;
+		}
+#endif
 		glfwSwapInterval(1);
 		glfwSetWindowUserPointer(_w, &_ctx);
 

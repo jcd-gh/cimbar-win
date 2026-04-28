@@ -20,8 +20,8 @@ TEST_CASE( "EncoderRoundTripTest/testFountain.Pad", "[unit]" )
 {
 	MakeTempDirectory tempdir;
 
-	std::string inputFile = tempdir.path() / "hello.txt";
-	std::string outPrefix = tempdir.path() / "encoder.fountain";
+	std::string inputFile = (tempdir.path() / "hello.txt").string();
+	std::string outPrefix = (tempdir.path() / "encoder.fountain").string();
 
 	{
 		std::ofstream f(inputFile);
@@ -41,12 +41,12 @@ TEST_CASE( "EncoderRoundTripTest/testFountain.Pad", "[unit]" )
 	SECTION ("default filename") {
 		// decoder
 		Decoder dec;
-		fountain_decoder_sink fds(cimbar::Config::fountain_chunk_size(), write_on_store<cimbar::zstd_decompressor<std::ofstream>>(tempdir.path()));
+		fountain_decoder_sink fds(cimbar::Config::fountain_chunk_size(), write_on_store<cimbar::zstd_decompressor<std::ofstream>>(tempdir.path().string()));
 
 		unsigned bytesDecoded = dec.decode_fountain(encodedImg, fds);
 		assertEquals( 7500, bytesDecoded );
 
-		std::string decodedContents = File(tempdir.path() / "0.626").read_all();
+		std::string decodedContents = File((tempdir.path() / "0.626").string()).read_all();
 		assertEquals( "hello", decodedContents );
 
 		assertEquals( 1, fds.num_done() );
@@ -54,12 +54,12 @@ TEST_CASE( "EncoderRoundTripTest/testFountain.Pad", "[unit]" )
 
 	SECTION ("parsed filename") {
 		Decoder dec;
-		fountain_decoder_sink fds(cimbar::Config::fountain_chunk_size(), decompress_on_store<std::ofstream>(tempdir.path()));
+		fountain_decoder_sink fds(cimbar::Config::fountain_chunk_size(), decompress_on_store<std::ofstream>(tempdir.path().string()));
 
 		unsigned bytesDecoded = dec.decode_fountain(encodedImg, fds);
 		assertEquals( 7500, bytesDecoded );
 
-		std::string decodedContents = File(tempdir.path() / "hello.txt").read_all();
+		std::string decodedContents = File((tempdir.path() / "hello.txt").string()).read_all();
 		assertEquals( "hello", decodedContents );
 
 		assertEquals( 1, fds.num_done() );
@@ -71,8 +71,8 @@ TEST_CASE( "EncoderRoundTripTest/testFountain.SinkMismatch", "[unit]" )
 	MakeTempDirectory tempdir;
 	ConfigScope cs(4);
 
-	std::string inputFile = tempdir.path() / "hello.txt";
-	std::string outPrefix = tempdir.path() / "encoder.fountain";
+	std::string inputFile = (tempdir.path() / "hello.txt").string();
+	std::string outPrefix = (tempdir.path() / "encoder.fountain").string();
 
 	{
 		std::ofstream f(inputFile);
@@ -94,7 +94,7 @@ TEST_CASE( "EncoderRoundTripTest/testFountain.SinkMismatch", "[unit]" )
 	// sink with a mismatched fountain_chunk_size
 	// importantly, the sink expects a *smaller* chunk than we'll give it...
 	// because that's a more interesting test...
-	fountain_decoder_sink fds(cimbar::Config::fountain_chunk_size()-125, write_on_store<cimbar::zstd_decompressor<std::ofstream>>(tempdir.path()));
+	fountain_decoder_sink fds(cimbar::Config::fountain_chunk_size()-125, write_on_store<cimbar::zstd_decompressor<std::ofstream>>(tempdir.path().string()));
 
 	unsigned bytesDecoded = dec.decode_fountain(encodedImg, fds);
 	assertEquals( 7500, bytesDecoded );
@@ -117,7 +117,7 @@ TEST_CASE( "EncoderRoundTripTest/testStreaming", "[unit]" )
 
 	// create decoder
 	Decoder dec;
-	fountain_decoder_sink fds(cimbar::Config::fountain_chunk_size(), write_on_store<cimbar::zstd_decompressor<std::ofstream>>(tempdir.path()));
+	fountain_decoder_sink fds(cimbar::Config::fountain_chunk_size(), write_on_store<cimbar::zstd_decompressor<std::ofstream>>(tempdir.path().string()));
 
 	// encode frames, then pass to decoder
 	for (int i = 0; i < 100; ++i)
@@ -134,7 +134,8 @@ TEST_CASE( "EncoderRoundTripTest/testStreaming", "[unit]" )
 
 	// done
 	assertEquals( 1, fds.num_done() );
-	std::string decodedContents = File(tempdir.path() / "0.5256").read_all();
+	std::string decodedContents = File((tempdir.path() / "0.5256").string()).read_all();
 	assertEquals( 16727, decodedContents.size() );
 	assertStringContains( "Mozilla Public License Version 2.0", decodedContents );
 }
+

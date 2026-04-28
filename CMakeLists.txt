@@ -7,6 +7,15 @@ if (MSVC)
     add_compile_options(/FI "iso646.h")
 endif()
 
+# MinGW needs gcc-ar for LTO support, and static runtime for portability
+if(MINGW)
+	set(CMAKE_AR "gcc-ar" CACHE FILEPATH "Archiver" FORCE)
+	set(CMAKE_RANLIB "gcc-ranlib" CACHE FILEPATH "Ranlib" FORCE)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libgcc -static-libstdc++")
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libgcc -static-libstdc++ -static")
+	set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -static-libgcc -static-libstdc++ -static")
+endif()
+
 set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
 
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
@@ -60,6 +69,11 @@ if(MSVC)
 	set(CPPFILESYSTEM "")
 endif()
 
+# GCC 9+ (including MinGW) has std::filesystem in libstdc++
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL "9")
+	set(CPPFILESYSTEM "")
+endif()
+
 set (PROJECTS
 	src/lib/bit_file
 	src/lib/chromatic_adaptation
@@ -96,9 +110,26 @@ set(PROJECTS
 )
 endif()
 
+if(WIN32)
+	set(OPENGL_LIB "opengl32")
+	set(GLFW_LIB "glfw3")
+else()
+	set(OPENGL_LIB "GL")
+	set(GLFW_LIB "glfw")
+endif()
+
+# MinGW may need GLES3 headers downloaded locally
+if(MINGW AND EXISTS "${libcimbar_SOURCE_DIR}/third_party_gles_headers")
+	include_directories("${libcimbar_SOURCE_DIR}/third_party_gles_headers")
+endif()
+
 include_directories(
 	${libcimbar_SOURCE_DIR}/src/lib
 	${libcimbar_SOURCE_DIR}/src/third_party_lib
+	"${libcimbar_SOURCE_DIR}/glfw-3.4/install-mingw/include"
+)
+link_directories(
+	"${libcimbar_SOURCE_DIR}/glfw-3.4/install-mingw/lib"
 )
 
 foreach(proj ${PROJECTS})

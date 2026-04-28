@@ -58,7 +58,7 @@ TEST_CASE( "FountainSinkSpecialTest/testMultipart", "[unit]" )
 	::srand( ::time(nullptr) );
 	MakeTempDirectory tempdir;
 
-	fountain_decoder_sink sink(750, write_on_store<std::ofstream>(tempdir.path()));
+	fountain_decoder_sink sink(750, write_on_store<std::ofstream>(tempdir.path().string()));
 
 	const int totalSize = 6000000;
 	string randostr = random_string(2500);
@@ -100,7 +100,7 @@ TEST_CASE( "FountainSinkSpecialTest/testMultipart", "[unit]" )
 	assertEquals( 0, sink.num_streams() );
 	assertEquals( 1, sink.num_done() );
 
-	string contents = File(tempdir.path() / fmt::format("108.{}", totalSize)).read_all();
+	string contents = File((tempdir.path() / fmt::format("108.{}", totalSize)).string()).read_all();
 	assertEquals( totalSize, contents.size() );
 	assertEquals( input.str(), contents );
 }
