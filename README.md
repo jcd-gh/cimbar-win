@@ -4,7 +4,9 @@
 感谢sz3无私的奉献及可靠的代码:https://github.com/sz3/libcimbar
 
 项目基于vibe coding修改（kimi-k2.6 on kimi code），人工重新确认过编译流程。
-opencv体积较大，为随项目附带，需自行下载并修改相关路径。
+opencv体积较大，未随项目附带，需自行下载并修改相关路径。
+
+成品见release页码。
 
 编译流程见WINDOWS_MINGW_BUILD.md
 
